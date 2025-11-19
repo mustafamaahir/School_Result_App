@@ -1,8 +1,8 @@
 # backend/main.py
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import auth, results  # use actual module names
-from backend.database import Base, engine
+from .routers import auth, results  # use actual module names
+from .database import Base, engine
 from dotenv import load_dotenv
 
 load_dotenv()
