@@ -1,4 +1,4 @@
-sch_rst_env
+sch_rst_env/
 backend/__pycache__/
 backend/routers/__pycache__/
 backend/utils/__pycache__/
