@@ -1,5 +1,5 @@
 # backend/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import auth, results  # use actual module names
 from backend.database import Base, engine
@@ -28,3 +28,7 @@ def home():
 # so include them without an extra prefix here.
 app.include_router(auth.router)
 app.include_router(results.router)
+
+@app.head("/status")
+async def status_head():
+    return Response(status_code=200)
