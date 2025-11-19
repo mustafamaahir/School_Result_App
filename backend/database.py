@@ -16,13 +16,13 @@ if not DATABASE_URL:
     DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'school_results.db')}"
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    # PostgreSQL for production (Render)
-    # Render provides postgres:// but SQLAlchemy 1.4+ requires postgresql://
+    # PostgreSQL for production (Supabase)
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     
     engine = create_engine(
         DATABASE_URL,
+        connect_args={"sslmode": "require"},
         pool_pre_ping=True,  # Verify connections before using
         pool_size=10,
         max_overflow=20
