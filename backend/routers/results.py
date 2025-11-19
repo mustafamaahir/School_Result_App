@@ -3,11 +3,11 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
 import pandas as pd
 from io import BytesIO
-from backend.database import get_db
-from backend import models
+from database import get_db
+import models
 import statistics
 import re
-from backend.utils.groq_agent import generate_student_report
+from utils.groq_agent import generate_student_report
 
 router = APIRouter(prefix="/results", tags=["Results"])
 
