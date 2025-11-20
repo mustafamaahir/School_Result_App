@@ -16,10 +16,10 @@ if not DATABASE_URL:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Create SQLAlchemy engine for Supabase
+# Create SQLAlchemy engine
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"sslmode": "require"},  # Enforce SSL for Supabase
+    # connect_args={"sslmode": "require"},  # Enforce SSL for Supabase
     pool_pre_ping=True,  # Verify connections before using
     pool_size=10,
     max_overflow=20
