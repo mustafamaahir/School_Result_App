@@ -10,15 +10,9 @@ load_dotenv()
 # Get DATABASE_URL from environment or use SQLite for local development
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
-    # Fallback to SQLite for local development
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'school_results.db')}"
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-else:
-    # PostgreSQL for production (Supabase)
-    if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# PostgreSQL for production (Supabase)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     
     engine = create_engine(
         DATABASE_URL,
