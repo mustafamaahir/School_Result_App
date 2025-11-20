@@ -1,8 +1,8 @@
-// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import AdminLayout from "./components/AdminLayout";
@@ -20,7 +20,6 @@ export default function App() {
     }
   });
 
-  // keep localStorage and state in sync
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
     else localStorage.removeItem("user");
@@ -31,12 +30,11 @@ export default function App() {
       <Navbar user={user} setUser={setUser} />
 
       <Routes>
-        {/* public */}
+        <Route path="/" element={<Home user={user} />} />
+
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Navigate to={user ? (user.role === "admin" ? "/admin/dashboard" : "/my-results") : "/login"} replace />} />
 
-        {/* admin protected routes */}
         <Route
           path="/admin/*"
           element={
@@ -48,10 +46,8 @@ export default function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="upload-results" element={<UploadResults />} />
-          {/* other admin routes */}
         </Route>
 
-        {/* student protected routes */}
         <Route
           path="/my-results"
           element={
@@ -61,7 +57,6 @@ export default function App() {
           }
         />
 
-        {/* fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -1,0 +1,26 @@
+.custom-navbar {
+  background: #0b3d2e !important; /* deep Islamic green */
+}
+
+.custom-navbar .navbar-brand {
+  color: #ffffff !important;
+  font-size: 20px;
+}
+
+.custom-navbar .nav-link {
+  color: #e8f5e9 !important;
+}
+
+.custom-navbar .nav-link:hover {
+  color: #c8ffd4 !important;
+}
+
+.custom-navbar .btn-light {
+  background: #ffffff;
+  color: #0b3d2e;
+  border: none;
+}
+
+.custom-navbar .btn-light:hover {
+  background: #e0ffe8;
+}
