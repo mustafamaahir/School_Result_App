@@ -68,7 +68,7 @@ export default function StudentResults({ user }) {
   const sortedTerms = ["All", "First Term", "Second Term", "Third Term"];
 
   return (
-    <div className="container-fluid px-0 mt-4">
+    <div className="container mt-4">
       <h3 className="mb-4 text-center text-primary">
         My Academic Results {studentName && ` - ${studentName}`}
       </h3>

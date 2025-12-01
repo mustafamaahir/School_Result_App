@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="container-fluid px-0">
+    <div className="container-fluid">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="fw-bold text-primary">
           <FaChartBar className="me-2" /> Admin Dashboard
