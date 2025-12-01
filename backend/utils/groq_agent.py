@@ -127,7 +127,7 @@ Focus on helping students understand their performance and providing concrete st
                 },
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=200,  # ✅ Increased for comprehensive analysis
+            max_tokens=500,  # ✅ Increased for comprehensive analysis
             temperature=0.7,   # ✅ Balanced creativity and consistency
             top_p=0.9
         )
