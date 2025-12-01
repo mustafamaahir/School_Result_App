@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid px-0">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="fw-bold text-primary">
           <FaChartBar className="me-2" /> Admin Dashboard
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
         <h5 className="fw-bold mb-3 d-flex align-items-center gap-2">
           <FaArrowUp /> Class Performance
         </h5>
-        <div style={{ width: "100%", height: 320 }}>
+        <div style={{ width: "100%", height: window.innerWidth < 768 ? 250 : 320 }}>
           <ResponsiveContainer>
             <BarChart data={avgPerClass}>
               <CartesianGrid strokeDasharray="3 3" />

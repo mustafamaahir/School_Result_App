@@ -68,7 +68,7 @@ export default function StudentResults({ user }) {
   const sortedTerms = ["All", "First Term", "Second Term", "Third Term"];
 
   return (
-    <div className="container mt-4">
+    <div className="container-fluid px-0 mt-4">
       <h3 className="mb-4 text-center text-primary">
         My Academic Results {studentName && ` - ${studentName}`}
       </h3>
@@ -128,25 +128,25 @@ export default function StudentResults({ user }) {
               </Card.Header>
               <Card.Body>
                 <div className="row text-center">
-                  <div className="col-md-3">
+                  <div className="col-md-3 col-6 mb-2">
                     <p className="text-muted mb-1">Average Score</p>
                     <h4 className="text-primary">{averageScore}%</h4>
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 col-6 mb-2">
                     <p className="text-muted mb-1">Highest Score</p>
                     <h4 className="text-success">{highestScore}%</h4>
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 col-6 mb-2">
                     <p className="text-muted mb-1">Lowest Score</p>
                     <h4 className="text-danger">{lowestScore}%</h4>
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 col-6 mb-2">
                     <p className="text-muted mb-1">Subjects</p>
                     <h4>{filteredResults.length}</h4>
                   </div>
 
                   {selectedTermPosition && (
-                    <div className="col-md-12 mt-3">
+                    <div className="col-12 mt-3">
                       <p className="text-muted mb-1">Position in Class</p>
                       <h3 className="text-info fw-bold">{selectedTermPosition}</h3>
                     </div>
