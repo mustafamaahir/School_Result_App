@@ -28,7 +28,5 @@ def home():
 async def status_head():
     return Response(status_code=200)
 
-# routers already define their own prefixes inside their files,
-# so include them without an extra prefix here.
 app.include_router(auth.router)
 app.include_router(results.router)

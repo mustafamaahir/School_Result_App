@@ -70,7 +70,7 @@ def bulk_register_from_csv(clear_existing: bool = False, db: Session = Depends(g
     import csv
     created = []
     
-    with open("backend/students.csv", "r") as f:
+    with open("students.csv", "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             exists = db.query(models.User).filter(
