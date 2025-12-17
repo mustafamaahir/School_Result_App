@@ -1,5 +1,6 @@
 # backend/routers/results.py
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 import pandas as pd
 from io import BytesIO
@@ -183,18 +184,29 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
             .distinct()
             .all()
         )
+        
+        # Get max number of subjects taken by any student in this class/term
+        max_subjects = (
+            db.query(func.count(models.StudentResult.id))
+            .filter(models.StudentResult.student_class == student_class,
+            models.StudentResult.term == term)
+            .group_by(models.StudentResult.student_id)
+            .all()
+)
+        max_subject_count = max([count for (count,) in max_subjects]) if max_subjects else 1
 
         class_average_map = {}
         for (sid,) in class_students:
             scores = db.query(models.StudentResult).filter(
-                models.StudentResult.student_id == sid,
-                models.StudentResult.student_class == student_class,
-                models.StudentResult.term == term
+            models.StudentResult.student_id == sid,
+            models.StudentResult.student_class == student_class,
+            models.StudentResult.term == term
             ).all()
             if scores:
-                avg = sum([s.percentage for s in scores]) / len(scores)
+                total = sum([s.percentage for s in scores])
+                avg = total / max_subject_count  # Divide by max, not student's count
                 class_average_map[sid] = avg
-
+        
         sorted_avgs = sorted(class_average_map.values(), reverse=True)
         student_avg = sum([r.percentage for r in term_results]) / len(term_results)
         try:
