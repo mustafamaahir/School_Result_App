@@ -65,6 +65,12 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         "user_id": new_user.id
     }
 
+@router.delete("/clear-users")
+def clear_all_users(db: Session = Depends(get_db)):
+    db.query(models.User).delete()
+    db.commit()
+    return {"message": "All users deleted"}
+
 
 # bulk register students from csv
 @router.post("/bulk-register-csv")
