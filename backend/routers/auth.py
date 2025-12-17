@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 import models, schemas
 from database import get_db
+from passlib.context import CryptContext
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -23,6 +24,11 @@ def get_current_user(
     return user
 
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
 @router.post("/register", status_code=200)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter(
@@ -31,10 +37,12 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     if existing:
         raise HTTPException(400, "Username already exists")
-
+    
+    hashed_pw = get_password_hash(user.password)
+    
     new_user = models.User(
         username=user.username,
-        password=user.password,  # hash in production
+        password=hashed_pw,
         role=user.role,
         full_name=user.full_name,
     )
@@ -48,6 +56,42 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         "user_id": new_user.id
     }
 
+@router.post("/bulk-register-csv")
+def bulk_register_from_csv(clear_existing: bool = False, db: Session = Depends(get_db)):
+    """
+    Import students from CSV file.
+    Set clear_existing=true to delete old users first.
+    """
+    if clear_existing:
+        db.query(models.User).delete()
+        db.commit()
+    
+    # Read CSV (put your CSV file in backend folder)
+    import csv
+    created = []
+    
+    with open("backend/students.csv", "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            exists = db.query(models.User).filter(
+                models.User.username == row["username"]
+            ).first()
+            
+            if exists:
+                continue
+                
+            hashed_pw = get_password_hash(row["password"])
+            new_user = models.User(
+                username=row["username"],
+                password=hashed_pw,
+                full_name=row["full_name"],
+                role=row.get("role", "student")
+            )
+            db.add(new_user)
+            created.append(row["username"])
+    
+    db.commit()
+    return {"created": len(created), "usernames": created}
 
 @router.post("/login")
 def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
