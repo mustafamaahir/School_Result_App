@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 import models, schemas
 from database import get_db
-from passlib.context import CryptContext
+import bcrypt
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -23,11 +23,13 @@ def get_current_user(
 
     return user
 
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+def verify_password(plain_password, hashed_password):
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
 
 @router.post("/register", status_code=200)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
