@@ -1,43 +1,46 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../api/api";
 
 export default function Login({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const res = await login(username, password);
-      // backend returns: { message, user_id, username, role }
       const payload = res.data || {};
       const userData = {
         id: payload.user_id,
         username: payload.username,
         role: payload.role,
-        // backend doesn't return full_name in login; if it does you can add it
         full_name: payload.full_name || payload.username,
       };
 
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
 
-      // route
       if (userData.role === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/my-results");
       }
     } catch (err) {
-      // show backend detail when available
-      const msg = err.response?.data?.detail || err.response?.data?.message || "Invalid username or password.";
+      const msg =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Invalid username or password.";
       setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,7 +58,6 @@ export default function Login({ setUser }) {
           onChange={(e) => setUsername(e.target.value)}
           required
         />
-
         <input
           className="form-control mb-3"
           type="password"
@@ -64,15 +66,16 @@ export default function Login({ setUser }) {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
-        <button className="btn btn-primary w-100">Login</button>
+        <button className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
 
       <p className="mt-3 text-center">
         Don’t have an account?{" "}
-        <a href="/signup" className="text-decoration-none">
+        <Link to="/signup" className="text-decoration-none">
           Sign Up
-        </a>
+        </Link>
       </p>
     </div>
   );

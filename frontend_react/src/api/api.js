@@ -11,6 +11,14 @@ export const api = axios.create({
 export const login = (username, password) =>
   api.post("/auth/login", { username, password });
 
+export const changePassword = (user_id, oldPassword, newPassword) => {
+  return axios.post(`${API_URL}/change-password`, {
+    user_id,
+    old_password: oldPassword,
+    new_password: newPassword,
+  });
+};
+
 export const register = (data) =>
   api.post("/auth/register", data);
 

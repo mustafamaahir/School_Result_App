@@ -3,19 +3,32 @@ from sqlalchemy.orm import Session
 import models, schemas
 from database import get_db
 import bcrypt
+import csv
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+# password hashing
+def get_password_hash(password: str) -> str:
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+
+
+# password verification
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed_password.encode("utf-8")
+    )
+
+
+# get current user using header
 def get_current_user(
     x_user_id: int = Header(None, alias="X-User-Id"),
     db: Session = Depends(get_db)
 ):
     if x_user_id is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Missing X-User-Id header"
-        )
+        raise HTTPException(status_code=401, detail="Missing X-User-Id header")
 
     user = db.query(models.User).filter(models.User.id == x_user_id).first()
     if not user:
@@ -23,30 +36,24 @@ def get_current_user(
 
     return user
 
-def get_password_hash(password):
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
-def verify_password(plain_password, hashed_password):
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-
-
-@router.post("/register", status_code=200)
+# admin register single user
+@router.post("/register")
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter(
         models.User.username == user.username
     ).first()
 
     if existing:
-        raise HTTPException(400, "Username already exists")
-    
-    hashed_pw = get_password_hash(user.password)
-    
+        raise HTTPException(status_code=400, detail="Username already exists")
+
     new_user = models.User(
         username=user.username,
-        password=hashed_pw,
-        role=user.role,
         full_name=user.full_name,
+        password=get_password_hash(user.password),
+        role=user.role,
+        must_change_password=True,
+        is_active=True
     )
 
     db.add(new_user)
@@ -54,59 +61,95 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return {
-        "message": f"{user.role.capitalize()} registered successfully",
+        "message": "User registered successfully",
         "user_id": new_user.id
     }
 
-@router.post("/bulk-register-csv")
-def bulk_register_from_csv(clear_existing: bool = False, db: Session = Depends(get_db)):
-    """
-    Import students from CSV file.
-    Set clear_existing=true to delete old users first.
-    """
-    if clear_existing:
-        db.query(models.User).delete()
-        db.commit()
-    
-    # Read CSV (put your CSV file in backend folder)
-    import csv
-    created = []
-    
-    with open("students.csv", "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            exists = db.query(models.User).filter(
-                models.User.username == row["username"]
-            ).first()
-            
-            if exists:
-                continue
-                
-            hashed_pw = get_password_hash(row["password"])
-            new_user = models.User(
-                username=row["username"],
-                password=hashed_pw,
-                full_name=row["full_name"],
-                role=row.get("role", "student")
-            )
-            db.add(new_user)
-            created.append(row["username"])
-    
-    db.commit()
-    return {"created": len(created), "usernames": created}
 
+# bulk register students from csv
+@router.post("/bulk-register-csv")
+def bulk_register_from_csv(db: Session = Depends(get_db)):
+    created_users = []
+
+    try:
+        with open("./students.csv", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+
+            for row in reader:
+                username = row["username"].strip()
+
+                exists = db.query(models.User).filter(
+                    models.User.username == username
+                ).first()
+
+                if exists:
+                    continue
+
+                new_user = models.User(
+                    username=username,
+                    full_name=row["full_name"].strip(),
+                    password=get_password_hash(row["password"]),
+                    role=row.get("role", "student"),
+                    must_change_password=True,
+                    is_active=True
+                )
+
+                db.add(new_user)
+                created_users.append(username)
+
+        db.commit()
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=500,
+            detail="students.csv file not found"
+        )
+
+    return {
+        "created": len(created_users),
+        "usernames": created_users
+    }
+
+
+# login
 @router.post("/login")
 def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(
-        models.User.username == user.username
+        models.User.username == user.username,
+        models.User.is_active == True
     ).first()
 
-    if not db_user or db_user.password != user.password:
-        raise HTTPException(401, "Invalid credentials")
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     return {
         "message": "Login successful",
         "user_id": db_user.id,
         "username": db_user.username,
         "role": db_user.role,
+        "must_change_password": db_user.must_change_password
+    }
+
+
+# change password (student)
+@router.post("/change-password")
+def change_password(
+    old_password: str,
+    new_password: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not verify_password(old_password, current_user.password):
+        raise HTTPException(status_code=400, detail="Old password is incorrect")
+
+    current_user.password = get_password_hash(new_password)
+    current_user.must_change_password = False
+
+    db.commit()
+
+    return {
+        "message": "Password changed successfully"
     }

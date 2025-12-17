@@ -1,5 +1,5 @@
 # backend/models.py
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -7,12 +7,12 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
-    role = Column(String)
-    full_name = Column(String)
-
-    # Keep user simple for now. Optional: add relationships if needed later.
+    username = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)  # hashed password
+    role = Column(String, nullable=False, default="student")
+    full_name = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)  # user can be deactivated
+    must_change_password = Column(Boolean, default=False)  # force password change
 
 class StudentResult(Base):
     __tablename__ = "results"

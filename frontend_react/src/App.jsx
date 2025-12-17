@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import ChangePassword from "./components/ChangePassword";
 import Signup from "./components/Signup";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./components/AdminDashboard";
@@ -34,6 +35,11 @@ export default function App() {
         <Route path="/" element={<Home user={user} />} />
 
         <Route path="/login" element={<Login setUser={setUser} />} />
+        {user && (
+          <>
+            <Route path="/change-password" element={<ChangePassword user={user} />} />
+          </>
+        )}
         <Route path="/signup" element={<Signup />} />
 
         <Route
