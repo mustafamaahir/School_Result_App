@@ -208,7 +208,7 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
                 class_average_map[sid] = avg
         
         sorted_avgs = sorted(class_average_map.values(), reverse=True)
-        student_avg = sum([r.percentage for r in term_results]) / len(term_results)
+        student_avg = sum([r.percentage for r in term_results]) / max_subject_count
         try:
             position = sorted_avgs.index(student_avg) + 1
         except ValueError:
