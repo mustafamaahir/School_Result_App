@@ -9,11 +9,14 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setMessage("");
+    setIsError(false);
+
     try {
       const payload = {
         full_name: fullName,
@@ -21,18 +24,33 @@ export default function Signup() {
         password,
         role,
       };
+
       await register(payload);
+
       setMessage("✅ Account created successfully! You can now log in.");
-      setTimeout(() => navigate("/login"), 1100);
+      setIsError(false);
+
+      setTimeout(() => navigate("/login"), 1200);
     } catch (error) {
-      setMessage(error?.response?.data || "❌ Signup failed. Try again.");
+      const backendMsg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.message ||
+        "❌ Username already exists.";
+
+      setMessage(backendMsg);
+      setIsError(true);
     }
   };
 
   return (
     <div className="container mt-5 col-md-5">
       <h3 className="mb-3">📝 Create Account</h3>
-      {message && <div className="alert alert-info">{message}</div>}
+
+      {message && (
+        <div className={`alert ${isError ? "alert-danger" : "alert-success"}`}>
+          {message}
+        </div>
+      )}
 
       <form onSubmit={handleSignup}>
         <input
