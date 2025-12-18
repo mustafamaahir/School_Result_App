@@ -57,9 +57,12 @@ export default function StudentResults({ user }) {
   });
 
   const showStats = selectedTerm !== "All" && filteredResults.length > 0;
+  
+  const totalSubjects =
+  termPositions?.[selectedTerm]?.total_subjects || filteredResults.length;
 
   const averageScore = showStats
-    ? (filteredResults.reduce((acc, curr) => acc + Number(curr.percentage || 0), 0) / filteredResults.length).toFixed(2)
+    ? (filteredResults.reduce((acc, curr) => acc + Number(curr.percentage || 0), 0) / totalSubjects).toFixed(2)
     : 0;
   const highestScore = showStats ? Math.max(...filteredResults.map(r => r.percentage)) : 0;
   const lowestScore = showStats ? Math.min(...filteredResults.map(r => r.percentage)) : 0;
