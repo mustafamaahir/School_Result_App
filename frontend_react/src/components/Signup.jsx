@@ -32,14 +32,19 @@ export default function Signup() {
 
       setTimeout(() => navigate("/login"), 1200);
     } catch (error) {
-      const backendMsg =
-        error?.response?.data?.detail ||
-        error?.response?.data?.message ||
-        "❌ Username already exists.";
+  let msg = "❌ Signup failed. Try again.";
 
-      setMessage(backendMsg);
-      setIsError(true);
-    }
+      if (typeof error?.response?.data === "string") {
+        msg = error.response.data;
+    } else if (error?.response?.data?.detail) {
+        msg = error.response.data.detail;
+      } else if (error?.response?.data?.message) {
+        msg = error.response.data.message;
+      }
+        setMessage(msg);
+        setIsError(true);
+}
+
   };
 
   return (
