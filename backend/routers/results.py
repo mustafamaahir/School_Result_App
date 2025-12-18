@@ -259,6 +259,8 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
                 "percentage": r.percentage,
                 "term": r.term,
                 "session": r.session,
+                "total_subjects": max_subject_count,
+                "subjects_taken": len(term_results),
                 "min_score_in_class": class_subject_stats.get(r.subject, {}).get("min", 0),
                 "max_score_in_class": class_subject_stats.get(r.subject, {}).get("max", 0),
                 "median_score_in_class": class_subject_stats.get(r.subject, {}).get("median", 0)

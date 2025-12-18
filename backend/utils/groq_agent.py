@@ -44,60 +44,68 @@ def _build_prompt(results: List[Union[Dict[str, Any], Any]]) -> str:
 
     # Extract percentages
     percentages = [
-        getattr(r, "percentage", None) or (r.get("percentage") if isinstance(r, dict) else None)
-        for r in results
-    ]
+    getattr(r, "percentage", None) or (r.get("percentage") if isinstance(r, dict) else None)
+    for r in results
+]
     percentages = [p for p in percentages if p is not None]
 
+    # Extract total_subjects from payload (single source of truth)
+    total_subjects = None
+    for r in results:
+        total_subjects = getattr(r, "total_subjects", None) or (
+            r.get("total_subjects") if isinstance(r, dict) else None
+    )
+        if total_subjects:
+            break
+
     subjects_taken = len(percentages)
-
-    # DEFINE total_subjects (important)
-    # Use the maximum subjects any student took in this term/class
-    total_subjects = max(subjects_taken, len(subject_scores)) if subjects_taken else 1
-
     total_score = sum(percentages)
 
-    # CORRECT average calculation
-    avg_score = total_score / total_subjects if total_subjects > 0 else 0
+    # GUARANTEED correct average
+    avg_score = (
+        total_score / total_subjects
+        if total_subjects and total_subjects > 0
+        else 0
+)
+
     highest = max(percentages) if percentages else 0
     lowest = min(percentages) if percentages else 0
-
+    
     # Build comprehensive prompt
     prompt = f"""Analyze the following academic performance for {student_name or 'the student'}:
 
-ACADEMIC PERIOD:
-{', '.join(sorted(terms_sessions)) if terms_sessions else 'Current Session'}
+    ACADEMIC PERIOD:
+    {', '.join(sorted(terms_sessions)) if terms_sessions else 'Current Session'}
 
-PERFORMANCE SUMMARY:
-- Subjects Taken: {subjects_taken}
-- Total Subjects: {total_subjects}
-- Average Score: {avg_score:.1f}%
-- Highest Score: {highest}%
-- Lowest Score: {lowest}%
+    PERFORMANCE SUMMARY:
+    - Subjects Taken: {subjects_taken}
+    - Total Subjects: {total_subjects}
+    - Average Score: {avg_score:.1f}%
+    - Highest Score: {highest}%
+    - Lowest Score: {lowest}%
+    DETAILED SUBJECT SCORES:
+    {chr(10).join(subject_scores)}
 
-DETAILED SUBJECT SCORES:
-{chr(10).join(subject_scores)}
+    REQUIRED ANALYSIS:
+    Provide a comprehensive academic performance report covering:
 
-REQUIRED ANALYSIS:
-Provide a comprehensive academic performance report covering:
+    1. OVERALL PERFORMANCE: Assess the student's general academic standing based on the average score and score distribution.
 
-1. OVERALL PERFORMANCE: Assess the student's general academic standing based on the average score and score distribution.
+    2. SUBJECT STRENGTHS: Identify top-performing subjects (scores ≥70%) and explain what these reveal about the student's aptitudes.
 
-2. SUBJECT STRENGTHS: Identify top-performing subjects (scores ≥70%) and explain what these reveal about the student's aptitudes.
+    3. AREAS FOR IMPROVEMENT: Highlight subjects needing attention (scores <50%) and discuss potential underlying challenges.
 
-3. AREAS FOR IMPROVEMENT: Highlight subjects needing attention (scores <50%) and discuss potential underlying challenges.
+    4. PERFORMANCE PATTERNS: Note any significant gaps between highest and lowest scores, consistency across subjects, or concerning trends.
 
-4. PERFORMANCE PATTERNS: Note any significant gaps between highest and lowest scores, consistency across subjects, or concerning trends.
-
-5. ACTIONABLE RECOMMENDATIONS: Provide 3-4 specific, practical strategies for improvement including:
+    5. ACTIONABLE RECOMMENDATIONS: Provide 3-4 specific, practical strategies for improvement including:
    - Study techniques for weaker subjects
    - Time management advice
    - Resource suggestions (tutoring, practice materials)
    - Motivational approach
 
-6. ENCOURAGEMENT: End with a motivating statement that acknowledges efforts and builds confidence.
+    6. ENCOURAGEMENT: End with a motivating statement that acknowledges efforts and builds confidence.
 
-Write in a professional yet encouraging tone. Use complete paragraphs, not bullet points. Be specific and reference actual scores where relevant."""
+    Write in a professional yet encouraging tone. Use complete paragraphs, not bullet points. Be specific and reference actual scores where relevant."""
     
     return prompt
 
