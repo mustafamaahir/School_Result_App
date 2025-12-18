@@ -42,14 +42,23 @@ def _build_prompt(results: List[Union[Dict[str, Any], Any]]) -> str:
         if term and session:
             terms_sessions.add(f"{term} ({session})")
 
-    # Calculate statistics
+    # Extract percentages
     percentages = [
         getattr(r, "percentage", None) or (r.get("percentage") if isinstance(r, dict) else None)
         for r in results
     ]
     percentages = [p for p in percentages if p is not None]
-    
-    avg_score = sum(percentages) / len(percentages) if percentages else 0
+
+    subjects_taken = len(percentages)
+
+    # DEFINE total_subjects (important)
+    # Use the maximum subjects any student took in this term/class
+    total_subjects = max(subjects_taken, len(subject_scores)) if subjects_taken else 1
+
+    total_score = sum(percentages)
+
+    # CORRECT average calculation
+    avg_score = total_score / total_subjects if total_subjects > 0 else 0
     highest = max(percentages) if percentages else 0
     lowest = min(percentages) if percentages else 0
 
@@ -60,7 +69,8 @@ ACADEMIC PERIOD:
 {', '.join(sorted(terms_sessions)) if terms_sessions else 'Current Session'}
 
 PERFORMANCE SUMMARY:
-- Total Subjects: {len(subject_scores)}
+- Subjects Taken: {subjects_taken}
+- Total Subjects: {total_subjects}
 - Average Score: {avg_score:.1f}%
 - Highest Score: {highest}%
 - Lowest Score: {lowest}%
@@ -88,7 +98,7 @@ Provide a comprehensive academic performance report covering:
 6. ENCOURAGEMENT: End with a motivating statement that acknowledges efforts and builds confidence.
 
 Write in a professional yet encouraging tone. Use complete paragraphs, not bullet points. Be specific and reference actual scores where relevant."""
-
+    
     return prompt
 
 
