@@ -223,7 +223,9 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
         term_positions[term] = {
             "position": position,
             "position_label": ordinal(position),
-            "average_score": student_avg
+            "average_score": student_avg,
+            "subjects_taken": len(term_results),
+            "total_subjects": max_subject_count
         }
 
         # Class subject stats

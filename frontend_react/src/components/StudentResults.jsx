@@ -142,7 +142,7 @@ export default function StudentResults({ user }) {
                   </div>
                   <div className="col-md-3 col-6 mb-2">
                     <p className="text-muted mb-1">Subjects</p>
-                    <h4>{filteredResults.length}</h4>
+                    <h4>{termPositions[selectedTerm]?.subjects_taken || filteredResults.length} / {termPositions[selectedTerm]?.total_subjects || filteredResults.length}</h4>
                   </div>
 
                   {selectedTermPosition && (
