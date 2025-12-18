@@ -115,7 +115,7 @@ def generate_student_report(results: List[Union[Dict[str, Any], Any]]) -> str:
             messages=[
                 {
                     "role": "system",
-                    "content": """You are an experienced academic advisor with expertise in educational psychology and student development. 
+                    "content": """You are an experienced academic advisor with expertise in educational psychology, Arabic and Islamic studies (PhD) and student development. 
 Your role is to provide insightful, evidence-based academic performance analyses that are:
 - Objective and data-driven
 - Encouraging yet honest
@@ -127,8 +127,8 @@ Focus on helping students understand their performance and providing concrete st
                 },
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500,  # ✅ Increased for comprehensive analysis
-            temperature=0.7,   # ✅ Balanced creativity and consistency
+            max_tokens=1200,  # ✅ Increased for comprehensive analysis
+            temperature=0.6,   # ✅ Balanced creativity and consistency
             top_p=0.9
         )
         
