@@ -78,7 +78,6 @@ def _build_prompt(results: List[Union[Dict[str, Any], Any]]) -> str:
     {', '.join(sorted(terms_sessions)) if terms_sessions else 'Current Session'}
 
     PERFORMANCE SUMMARY:
-    - Subjects Taken: {subjects_taken}
     - Total Subjects: {total_subjects}
     - Average Score: {avg_score:.1f}%
     - Highest Score: {highest}%
