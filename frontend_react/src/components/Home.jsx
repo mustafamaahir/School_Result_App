@@ -68,7 +68,7 @@ export default function Home({ user }) {
 
       {/* FOOTER */}
       <footer className="footer">
-        © 2025 By Mustafa Mudathir (AI Data Scientist)
+        © 2025 DAARUL-FAOZ FOR ARABIC & ISLAMIC STUDIES. All rights reserved.
       </footer>
     </div>
   );
