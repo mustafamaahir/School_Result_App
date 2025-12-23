@@ -6,6 +6,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Card from "react-bootstrap/Card";
+import { generateResultsPDF } from "../utils/pdfGenerator";
 
 export default function StudentResults({ user }) {
   const [results, setResults] = useState([]);
@@ -122,6 +123,27 @@ export default function StudentResults({ user }) {
               </div>
             </Card.Body>
           </Card>
+
+          {/* Download PDF Button */}
+          <div className="text-end mb-3">
+            <Button
+              variant="success"
+              onClick={() =>
+                generateResultsPDF(
+                  studentName,
+                  results,
+                  selectedTerm,
+                  selectedSession,
+                  termPositions,
+                  academicAnalysis
+                )
+              }
+              disabled={results.length === 0}
+            >
+              <i className="bi bi-file-earmark-pdf me-2"></i>
+              Download PDF Report
+            </Button>
+          </div>
 
           {/* Stats */}
           {showStats && (
