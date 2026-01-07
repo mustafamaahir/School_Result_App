@@ -128,7 +128,7 @@ def generate_student_report(results: List[Union[Dict[str, Any], Any]]) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # ✅ Updated to latest model
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
@@ -144,8 +144,8 @@ Focus on helping students understand their performance and providing concrete st
                 },
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1200,  # ✅ Increased for comprehensive analysis
-            temperature=0.6,   # ✅ Balanced creativity and consistency
+            max_tokens=1200,  
+            temperature=0.6, 
             top_p=0.9
         )
         
