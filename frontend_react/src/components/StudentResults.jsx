@@ -176,6 +176,11 @@ export default function StudentResults({ user }) {
                       <h3 className="text-info fw-bold">{selectedTermPosition}</h3>
                     </div>
                   )}
+
+                  <div className="col-12 mt-3">
+                    <p className="text-muted mb-1">Total Students</p>
+                    <h3 className="text-info fw-bold">{termPositions[selectedTerm]?.total_students || "-"}</h3>
+                  </div>
                 </div>
               </Card.Body>
             </Card>

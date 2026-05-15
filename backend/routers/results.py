@@ -187,8 +187,9 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
         
         # Get max number of subjects taken by any student in this class/term
         max_subjects = (
-            db.query(func.count(models.StudentResult.id))
-            .filter(models.StudentResult.student_class == student_class,
+            db.query(func.count(func.distinct(models.StudentResult.subject)))
+            .filter(
+            models.StudentResult.student_class == student_class,
             models.StudentResult.term == term)
             .group_by(models.StudentResult.student_id)
             .all()
@@ -197,6 +198,8 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
 
         class_average_map = {}
         for (sid,) in class_students:
+            if sid is None:
+                continue
             scores = db.query(models.StudentResult).filter(
             models.StudentResult.student_id == sid,
             models.StudentResult.student_class == student_class,
@@ -208,11 +211,11 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
                 class_average_map[sid] = avg
         
         sorted_avgs = sorted(class_average_map.values(), reverse=True)
-        student_avg = sum([r.percentage for r in term_results]) / max_subject_count
-        try:
-            position = sorted_avgs.index(student_avg) + 1
-        except ValueError:
-            position = None
+        student_avg = class_average_map.get(user.id)
+        position = next(
+        (i + 1 for i, avg in enumerate(sorted_avgs) if abs(avg - student_avg) < 0.0001),
+        None
+)       if student_avg is not None else None
 
         def ordinal(n):
             return "%d%s" % (
@@ -225,7 +228,8 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
             "position_label": ordinal(position),
             "average_score": student_avg,
             "subjects_taken": len(term_results),
-            "total_subjects": max_subject_count
+            "total_subjects": max_subject_count,
+            "total_students": len(class_average_map)
         }
 
         # Class subject stats
@@ -269,12 +273,10 @@ def get_student_result(username: str = None, db: Session = Depends(get_db)):
     # Academic analysis (latest term)
     academic_analysis = None
     try:
-        latest_data = [
-            r for r in results_data if r["term"] == latest_term
-        ]
-        academic_analysis = generate_student_report(latest_data)
-    except:
-        academic_analysis = None
+                academic_analysis = generate_student_report(results_data)
+    except Exception as e:
+            print(f"Report generation error: {e}")  # check terminal
+            academic_analysis = None
 
     return {
         "results": results_data,
