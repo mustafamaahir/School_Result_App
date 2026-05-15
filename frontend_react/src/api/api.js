@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8000"; 
+const API_URL = "https://school-result-app-3k2s.onrender.com"; 
 
 export const api = axios.create({
   baseURL: API_URL,
