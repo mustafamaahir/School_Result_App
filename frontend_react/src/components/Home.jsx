@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
-import heroImage from "../assets/home-hero.png"; // adjust path relative to Home.jsx
+import heroImage from "../assets/home-hero.png";
 
 export default function Home({ user }) {
   return (
