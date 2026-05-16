@@ -24,8 +24,9 @@ app.add_middleware(
 def home():
     return {"message": "Welcome to School Result API"}
 
+@app.get("/status")
 @app.head("/status")
-async def status_head():
+async def status():
     return Response(status_code=200)
 
 app.include_router(auth.router)
