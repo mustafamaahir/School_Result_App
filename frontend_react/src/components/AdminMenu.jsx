@@ -1,13 +1,13 @@
 // src/components/AdminMenu.jsx
 import React from "react";
-import { useLocation} from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 export default function AdminMenu() {
   const location = useLocation();
-  // const linkStyle = (p) => ({
-    // textDecoration: "none",
-    // color: location.pathname === p ? "#007bff" : "#000",
-  // });
+  const linkStyle = (p) => ({
+    textDecoration: "none",
+    color: location.pathname === p ? "#007bff" : "#000",
+  });
 
   return (
     <div
@@ -21,12 +21,12 @@ export default function AdminMenu() {
         padding: "20px",
       }}
     >
-      {/* <h5>Admin Menu</h5>
+      <h5>Admin Menu</h5>
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li><Link to="/admin/upload" style={linkStyle("/admin/upload-results")}>📤 Upload Results</Link></li>
         <li><Link to="/admin/students" style={linkStyle("/admin/students")}>👥 Students</Link></li>
-        <li><Link to="/admin/dashboard" style={linkStyle("/admin/dashboard")}>📊 Dashboard</Link></li> */}
-      {/* </ul> */}
+        <li><Link to="/admin/dashboard" style={linkStyle("/admin/dashboard")}>📊 Dashboard</Link></li>
+      </ul>
     </div>
   );
 }
