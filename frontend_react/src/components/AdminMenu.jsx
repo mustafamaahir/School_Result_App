@@ -21,12 +21,12 @@ export default function AdminMenu() {
         padding: "20px",
       }}
     >
-      <h5>Admin Menu</h5>
+      {/* <h5>Admin Menu</h5>
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li><Link to="/admin/upload" style={linkStyle("/admin/upload-results")}>📤 Upload Results</Link></li>
         <li><Link to="/admin/students" style={linkStyle("/admin/students")}>👥 Students</Link></li>
-        <li><Link to="/admin/dashboard" style={linkStyle("/admin/dashboard")}>📊 Dashboard</Link></li>
-      </ul>
+        <li><Link to="/admin/dashboard" style={linkStyle("/admin/dashboard")}>📊 Dashboard</Link></li> */}
+      {/* </ul> */}
     </div>
   );
 }
