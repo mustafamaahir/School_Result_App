@@ -1,6 +1,6 @@
 // src/components/AdminMenu.jsx
 import React from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation} from "react-router-dom";
 
 export default function AdminMenu() {
   const location = useLocation();
